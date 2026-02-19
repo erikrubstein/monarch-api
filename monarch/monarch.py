@@ -2763,6 +2763,971 @@ class Monarch(object):
             "Web_GetUpcomingRecurringTransactionItems", query, variables
         )
 
+    async def add_transaction_attachment(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Adds an existing uploaded attachment to a transaction.
+
+        :param input_data:
+            Payload for TransactionAddAttachmentMutationInput.
+        """
+        query = gql(
+            """
+            mutation Common_AddTransactionAttachment($input: TransactionAddAttachmentMutationInput!) {
+              addTransactionAttachment(input: $input) {
+                attachment {
+                  id
+                  publicId
+                  extension
+                  sizeBytes
+                  filename
+                  originalAssetUrl
+                  __typename
+                }
+                errors {
+                  message
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_AddTransactionAttachment",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
+    async def get_transaction_attachment_upload_info(
+        self, transaction_id: str
+    ) -> Dict[str, Any]:
+        """
+        Gets signed upload info for transaction attachments.
+        """
+        query = gql(
+            """
+            mutation Common_GetTransactionAttachmentUploadInfo($transactionId: UUID!) {
+              getTransactionAttachmentUploadInfo(transactionId: $transactionId) {
+                info {
+                  path
+                  requestParams {
+                    timestamp
+                    folder
+                    signature
+                    api_key
+                    upload_preset
+                    __typename
+                  }
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_GetTransactionAttachmentUploadInfo",
+            graphql_query=query,
+            variables={"transactionId": transaction_id},
+        )
+
+    async def get_transaction_attachment(self, attachment_id: str) -> Dict[str, Any]:
+        """
+        Gets transaction attachment details by attachment ID.
+        """
+        query = gql(
+            """
+            query Mobile_GetAttachmentDetails($attachmentId: UUID!) {
+              transactionAttachment(id: $attachmentId) {
+                id
+                originalAssetUrl
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Mobile_GetAttachmentDetails",
+            graphql_query=query,
+            variables={"attachmentId": attachment_id},
+        )
+
+    async def delete_transaction_attachment_mobile(self, attachment_id: str) -> Dict[str, Any]:
+        """
+        Deletes a transaction attachment using the mobile operation.
+        """
+        query = gql(
+            """
+            mutation Mobile_DeleteAttachment($attachmentId: UUID!) {
+              deleteTransactionAttachment(id: $attachmentId) {
+                deleted
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Mobile_DeleteAttachment",
+            graphql_query=query,
+            variables={"attachmentId": attachment_id},
+        )
+
+    async def delete_transaction_attachment_web(self, attachment_id: str) -> Dict[str, Any]:
+        """
+        Deletes a transaction attachment using the web operation.
+        """
+        query = gql(
+            """
+            mutation Web_TransactionDrawerDeleteAttachment($id: UUID!) {
+              deleteTransactionAttachment(id: $id) {
+                deleted
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_TransactionDrawerDeleteAttachment",
+            graphql_query=query,
+            variables={"id": attachment_id},
+        )
+
+    async def get_retail_extension_settings(self) -> Dict[str, Any]:
+        """
+        Gets retail extension settings for the household.
+        """
+        query = gql(
+            """
+            query Common_GetRetailExtensionSettings {
+              retailExtensionSettings {
+                id
+                retailVendorSettings {
+                  id
+                  vendor
+                  shouldCategorizeAndSplitTransactions
+                  shouldUpdateTransactionsNotes
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_GetRetailExtensionSettings",
+            graphql_query=query,
+        )
+
+    async def get_retail_sync(self, sync_id: str) -> Dict[str, Any]:
+        """
+        Gets a specific retail sync and its orders.
+        """
+        query = gql(
+            """
+            query Common_RetailSyncQuery($syncId: ID!) {
+              retailSync(id: $syncId) {
+                id
+                vendor
+                status
+                startedAt
+                endedAt
+                createdAt
+                updatedAt
+                orders {
+                  id
+                  merchantName
+                  vendor
+                  vendorOrderId
+                  date
+                  grandTotal
+                  displayStatus
+                  __typename
+                }
+                attachments {
+                  id
+                  storageId
+                  filename
+                  extension
+                  sizeBytes
+                  originalAssetUrl
+                  thumbnailUrl
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_RetailSyncQuery",
+            graphql_query=query,
+            variables={"syncId": sync_id},
+        )
+
+    async def get_retail_syncs_with_total(
+        self,
+        filters: Optional[Dict[str, Any]] = None,
+        offset: int = 0,
+        limit: int = DEFAULT_RECORD_LIMIT,
+        include_total_count: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Gets paginated retail syncs and optional total count.
+        """
+        query = gql(
+            """
+            query Common_RetailSyncsQueryWithTotal(
+              $filters: RetailSyncFilterInput!
+              $offset: Int!
+              $limit: Int!
+              $includeTotalCount: Boolean
+            ) {
+              retailSyncsWithTotal(
+                filters: $filters
+                offset: $offset
+                limit: $limit
+                includeTotalCount: $includeTotalCount
+              ) {
+                totalCount
+                results {
+                  id
+                  vendor
+                  status
+                  startedAt
+                  endedAt
+                  createdAt
+                  updatedAt
+                  orders {
+                    id
+                    merchantName
+                    vendor
+                    vendorOrderId
+                    date
+                    totalForProducts
+                    shipping
+                    deliveryFee
+                    additionalCharges
+                    adjustmentsAmount
+                    totalBeforeTax
+                    tax
+                    tip
+                    giftCardAmount
+                    grandTotal
+                    displayStatus
+                    retailLineItems {
+                      id
+                      title
+                      quantity
+                      price
+                      total
+                      isAssociatedToRetailTransaction
+                      category {
+                        id
+                        name
+                        icon
+                        __typename
+                      }
+                      __typename
+                    }
+                    retailTransactions {
+                      id
+                      date
+                      total
+                      transactionType
+                      transactionUpdateSkipped
+                      transaction {
+                        id
+                        isManual
+                        __typename
+                      }
+                      __typename
+                    }
+                    __typename
+                  }
+                  attachments {
+                    id
+                    storageId
+                    filename
+                    extension
+                    sizeBytes
+                    originalAssetUrl
+                    thumbnailUrl
+                    __typename
+                  }
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+
+        if filters is None:
+            filters = {}
+
+        return await self.gql_call(
+            operation="Common_RetailSyncsQueryWithTotal",
+            graphql_query=query,
+            variables={
+                "filters": filters,
+                "offset": offset,
+                "limit": limit,
+                "includeTotalCount": include_total_count,
+            },
+        )
+
+    async def create_retail_sync(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Creates a retail sync record.
+
+        :param input_data:
+            Payload for CreateRetailSyncInput.
+        """
+        query = gql(
+            """
+            mutation Common_CreateRetailSync($input: CreateRetailSyncInput!) {
+              createRetailSync(input: $input) {
+                retailSync {
+                  id
+                  vendor
+                  status
+                  startedAt
+                  endedAt
+                  createdAt
+                  updatedAt
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_CreateRetailSync",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
+    async def start_retail_sync(self, sync_id: str) -> Dict[str, Any]:
+        """
+        Starts an existing retail sync.
+        """
+        query = gql(
+            """
+            mutation Common_StartRetailSync($syncId: ID!) {
+              startRetailSync(id: $syncId) {
+                retailSync {
+                  id
+                  vendor
+                  status
+                  startedAt
+                  endedAt
+                  createdAt
+                  updatedAt
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_StartRetailSync",
+            graphql_query=query,
+            variables={"syncId": sync_id},
+        )
+
+    async def complete_retail_sync(self, sync_id: str) -> Dict[str, Any]:
+        """
+        Completes an existing retail sync.
+        """
+        query = gql(
+            """
+            mutation Common_CompleteRetailSync($syncId: ID!) {
+              completeRetailSync(id: $syncId) {
+                retailSync {
+                  id
+                  vendor
+                  status
+                  startedAt
+                  endedAt
+                  createdAt
+                  updatedAt
+                  orders {
+                    id
+                    merchantName
+                    vendor
+                    vendorOrderId
+                    date
+                    grandTotal
+                    displayStatus
+                    __typename
+                  }
+                  attachments {
+                    id
+                    storageId
+                    filename
+                    extension
+                    sizeBytes
+                    originalAssetUrl
+                    thumbnailUrl
+                    __typename
+                  }
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_CompleteRetailSync",
+            graphql_query=query,
+            variables={"syncId": sync_id},
+        )
+
+    async def delete_retail_sync(self, sync_id: str) -> Dict[str, Any]:
+        """
+        Deletes an unmatched retail sync.
+        """
+        query = gql(
+            """
+            mutation Common_DeleteRetailSync($syncId: ID!) {
+              deleteUnmatchedRetailSync(id: $syncId) {
+                success
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_DeleteRetailSync",
+            graphql_query=query,
+            variables={"syncId": sync_id},
+        )
+
+    async def match_retail_transaction(
+        self, retail_transaction_id: str, transaction_id: str
+    ) -> Dict[str, Any]:
+        """
+        Matches a retail transaction to a Monarch transaction.
+        """
+        query = gql(
+            """
+            mutation Common_MatchRetailTransaction($retailTransactionId: ID!, $transactionId: ID!) {
+              matchRetailTransaction(
+                retailTransactionId: $retailTransactionId
+                transactionId: $transactionId
+              ) {
+                retailSync {
+                  id
+                  vendor
+                  status
+                  startedAt
+                  endedAt
+                  createdAt
+                  updatedAt
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_MatchRetailTransaction",
+            graphql_query=query,
+            variables={
+                "retailTransactionId": retail_transaction_id,
+                "transactionId": transaction_id,
+            },
+        )
+
+    async def update_retail_order(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Updates a retail order.
+
+        :param input_data:
+            Payload for UpdateRetailOrderInput.
+        """
+        query = gql(
+            """
+            mutation Common_UpdateRetailOrder($input: UpdateRetailOrderInput!) {
+              updateRetailOrder(input: $input) {
+                retailSync {
+                  id
+                  vendor
+                  status
+                  startedAt
+                  endedAt
+                  createdAt
+                  updatedAt
+                  orders {
+                    id
+                    merchantName
+                    vendor
+                    vendorOrderId
+                    date
+                    grandTotal
+                    displayStatus
+                    __typename
+                  }
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_UpdateRetailOrder",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
+    async def update_retail_vendor_settings(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Updates retail vendor settings.
+
+        :param input_data:
+            Payload for UpdateRetailVendorSettingsInput.
+        """
+        query = gql(
+            """
+            mutation Common_UpdateRetailVendorSettings($input: UpdateRetailVendorSettingsInput!) {
+              updateRetailVendorSettings(input: $input) {
+                retailVendorSettings {
+                  id
+                  vendor
+                  shouldCategorizeAndSplitTransactions
+                  shouldUpdateTransactionsNotes
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_UpdateRetailVendorSettings",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
+    async def get_user_has_configured_extension(self) -> Dict[str, Any]:
+        """
+        Indicates whether the user has configured the retail sync extension.
+        """
+        query = gql(
+            """
+            query Web_GetUserHasConfiguredExtension {
+              userHasConfiguredRetailSyncExtension
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_GetUserHasConfiguredExtension",
+            graphql_query=query,
+        )
+
+    async def get_user_dismissed_retail_sync_banner(self) -> Dict[str, Any]:
+        """
+        Gets retail extension and banner dismissal state for the user profile.
+        """
+        query = gql(
+            """
+            query Web_GetUserDismissedRetailSyncBanner {
+              userHasConfiguredRetailSyncExtension
+              me {
+                id
+                profile {
+                  id
+                  dismissedRetailSyncBanner
+                  dismissedRetailSyncTargetBannerAt
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_GetUserDismissedRetailSyncBanner",
+            graphql_query=query,
+        )
+
+    async def update_dismissed_retail_sync_banner(
+        self,
+        dismissed_retail_sync_banner: Optional[bool] = None,
+        dismissed_retail_sync_target_banner_at: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Updates banner dismissal fields on the user profile.
+        """
+        query = gql(
+            """
+            mutation Web_UpdateDismissedRetailSyncBanner(
+              $dismissedRetailSyncBanner: Boolean
+              $dismissedRetailSyncTargetBannerAt: DateTime
+            ) {
+              updateUserProfile(
+                input: {
+                  dismissedRetailSyncBanner: $dismissedRetailSyncBanner
+                  dismissedRetailSyncTargetBannerAt: $dismissedRetailSyncTargetBannerAt
+                }
+              ) {
+                userProfile {
+                  dismissedRetailSyncBanner
+                  dismissedRetailSyncTargetBannerAt
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_UpdateDismissedRetailSyncBanner",
+            graphql_query=query,
+            variables={
+                "dismissedRetailSyncBanner": dismissed_retail_sync_banner,
+                "dismissedRetailSyncTargetBannerAt": dismissed_retail_sync_target_banner_at,
+            },
+        )
+
+    async def update_account_group_order(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Updates account group ordering.
+
+        :param input_data:
+            Payload for UpdateAccountGroupOrderInput.
+        """
+        query = gql(
+            """
+            mutation Common_UpdateAccountGroupOrder($input: UpdateAccountGroupOrderInput!) {
+              updateAccountGroupOrder(input: $input) {
+                household {
+                  preferences {
+                    id
+                    accountGroupOrder
+                    __typename
+                  }
+                  __typename
+                }
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_UpdateAccountGroupOrder",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
+    async def update_account_order(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Updates account ordering.
+
+        :param input_data:
+            Payload for UpdateAccountOrderInput.
+        """
+        query = gql(
+            """
+            mutation Web_UpdateAccountOrder($input: UpdateAccountOrderInput!) {
+              updateAccountOrder(input: $input) {
+                account {
+                  id
+                  order
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_UpdateAccountOrder",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
+    async def update_transaction_tag_order(self, tag_id: str, order: int) -> Dict[str, Any]:
+        """
+        Updates display order for a transaction tag.
+        """
+        query = gql(
+            """
+            mutation Common_UpdateTransactionTagOrder($tagId: ID!, $order: Int!) {
+              updateTransactionTagOrder(tagId: $tagId, order: $order) {
+                householdTransactionTags {
+                  id
+                  order
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Common_UpdateTransactionTagOrder",
+            graphql_query=query,
+            variables={"tagId": tag_id, "order": order},
+        )
+
+    async def update_category_group_order_mobile(
+        self, category_group_id: str, order: int
+    ) -> Dict[str, Any]:
+        """
+        Updates category group order using the mobile operation.
+        """
+        query = gql(
+            """
+            mutation Mobile_UpdateCategoryGroupOrderMutation($id: UUID!, $order: Int!) {
+              updateCategoryGroupOrder(id: $id, order: $order) {
+                categoryGroups {
+                  id
+                  order
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Mobile_UpdateCategoryGroupOrderMutation",
+            graphql_query=query,
+            variables={"id": category_group_id, "order": order},
+        )
+
+    async def update_category_group_order_web(
+        self, category_group_id: str, order: int
+    ) -> Dict[str, Any]:
+        """
+        Updates category group order using the web operation.
+        """
+        query = gql(
+            """
+            mutation Web_UpdateCategoryGroupOrder($id: UUID!, $order: Int!) {
+              updateCategoryGroupOrder(id: $id, order: $order) {
+                categoryGroups {
+                  id
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_UpdateCategoryGroupOrder",
+            graphql_query=query,
+            variables={"id": category_group_id, "order": order},
+        )
+
+    async def update_category_order_mobile(
+        self, category_id: str, category_group_id: str, order: int
+    ) -> Dict[str, Any]:
+        """
+        Updates category order within a category group using the mobile operation.
+        """
+        query = gql(
+            """
+            mutation Mobile_UpdateCategoryOrderMutation($id: UUID!, $categoryGroupId: UUID!, $order: Int!) {
+              updateCategoryOrderInCategoryGroup(id: $id, categoryGroupId: $categoryGroupId, order: $order) {
+                category {
+                  id
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Mobile_UpdateCategoryOrderMutation",
+            graphql_query=query,
+            variables={"id": category_id, "categoryGroupId": category_group_id, "order": order},
+        )
+
+    async def update_category_order_web(
+        self, category_id: str, category_group_id: str, order: int
+    ) -> Dict[str, Any]:
+        """
+        Updates category order within a category group using the web operation.
+        """
+        query = gql(
+            """
+            mutation Web_UpdateCategoryOrder($id: UUID!, $categoryGroupId: UUID!, $order: Int!) {
+              updateCategoryOrderInCategoryGroup(id: $id, categoryGroupId: $categoryGroupId, order: $order) {
+                category {
+                  id
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_UpdateCategoryOrder",
+            graphql_query=query,
+            variables={"id": category_id, "categoryGroupId": category_group_id, "order": order},
+        )
+
+    async def update_transaction_rule_order(
+        self, rule_id: str, order: int
+    ) -> Dict[str, Any]:
+        """
+        Updates transaction rule order.
+        """
+        query = gql(
+            """
+            mutation Web_UpdateRuleOrderMutation($id: ID!, $order: Int!) {
+              updateTransactionRuleOrderV2(id: $id, order: $order) {
+                transactionRules {
+                  id
+                  order
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_UpdateRuleOrderMutation",
+            graphql_query=query,
+            variables={"id": rule_id, "order": order},
+        )
+
+    async def cancel_subscription_sponsorship(
+        self, input_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Cancels a subscription sponsorship.
+
+        :param input_data:
+            Payload for CancelSponsorshipInput.
+        """
+        query = gql(
+            """
+            mutation Web_BillingSettingsCancelSponsorship($input: CancelSponsorshipInput!) {
+              cancelSubscriptionSponsorship(input: $input) {
+                canceled
+                errors {
+                  fieldErrors {
+                    field
+                    messages
+                    __typename
+                  }
+                  message
+                  code
+                  __typename
+                }
+                __typename
+              }
+            }
+            """
+        )
+        return await self.gql_call(
+            operation="Web_BillingSettingsCancelSponsorship",
+            graphql_query=query,
+            variables={"input": input_data},
+        )
+
     def _get_current_date(self) -> str:
         """
         Returns the current date as a string formatted like %Y-%m-%d.

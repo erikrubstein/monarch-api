@@ -221,6 +221,252 @@ class TestMonarch(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(result["categoryGroups"]), 2, "Expected 2 category groups")
         self.assertEqual(len(result["goalsV2"]), 1, "Expected 1 goal")
 
+    @patch.object(Client, "execute_async")
+    async def test_receipt_and_ordering_endpoints(self, mock_execute_async):
+        """
+        Ensures new receipt/ordering endpoint wrappers call the expected
+        GraphQL operation names and variables.
+        """
+        mock_execute_async.return_value = {}
+
+        cases = [
+            (
+                "add_transaction_attachment",
+                "Common_AddTransactionAttachment",
+                {"input": {"transactionId": "txn-1", "publicId": "pub-1"}},
+                lambda: self.monarch_money.add_transaction_attachment(
+                    {"transactionId": "txn-1", "publicId": "pub-1"}
+                ),
+            ),
+            (
+                "complete_retail_sync",
+                "Common_CompleteRetailSync",
+                {"syncId": "sync-1"},
+                lambda: self.monarch_money.complete_retail_sync("sync-1"),
+            ),
+            (
+                "create_retail_sync",
+                "Common_CreateRetailSync",
+                {"input": {"vendor": "amazon"}},
+                lambda: self.monarch_money.create_retail_sync({"vendor": "amazon"}),
+            ),
+            (
+                "delete_retail_sync",
+                "Common_DeleteRetailSync",
+                {"syncId": "sync-2"},
+                lambda: self.monarch_money.delete_retail_sync("sync-2"),
+            ),
+            (
+                "get_transaction_attachment_upload_info",
+                "Common_GetTransactionAttachmentUploadInfo",
+                {"transactionId": "11111111-1111-1111-1111-111111111111"},
+                lambda: self.monarch_money.get_transaction_attachment_upload_info(
+                    "11111111-1111-1111-1111-111111111111"
+                ),
+            ),
+            (
+                "match_retail_transaction",
+                "Common_MatchRetailTransaction",
+                {"retailTransactionId": "retail-1", "transactionId": "txn-2"},
+                lambda: self.monarch_money.match_retail_transaction(
+                    "retail-1", "txn-2"
+                ),
+            ),
+            (
+                "start_retail_sync",
+                "Common_StartRetailSync",
+                {"syncId": "sync-3"},
+                lambda: self.monarch_money.start_retail_sync("sync-3"),
+            ),
+            (
+                "update_account_group_order",
+                "Common_UpdateAccountGroupOrder",
+                {"input": {"order": ["asset", "liability"]}},
+                lambda: self.monarch_money.update_account_group_order(
+                    {"order": ["asset", "liability"]}
+                ),
+            ),
+            (
+                "update_retail_order",
+                "Common_UpdateRetailOrder",
+                {"input": {"id": "order-1", "merchantName": "Target"}},
+                lambda: self.monarch_money.update_retail_order(
+                    {"id": "order-1", "merchantName": "Target"}
+                ),
+            ),
+            (
+                "update_retail_vendor_settings",
+                "Common_UpdateRetailVendorSettings",
+                {
+                    "input": {
+                        "vendor": "amazon",
+                        "shouldCategorizeAndSplitTransactions": True,
+                    }
+                },
+                lambda: self.monarch_money.update_retail_vendor_settings(
+                    {
+                        "vendor": "amazon",
+                        "shouldCategorizeAndSplitTransactions": True,
+                    }
+                ),
+            ),
+            (
+                "update_transaction_tag_order",
+                "Common_UpdateTransactionTagOrder",
+                {"tagId": "tag-1", "order": 4},
+                lambda: self.monarch_money.update_transaction_tag_order("tag-1", 4),
+            ),
+            (
+                "delete_transaction_attachment_mobile",
+                "Mobile_DeleteAttachment",
+                {"attachmentId": "22222222-2222-2222-2222-222222222222"},
+                lambda: self.monarch_money.delete_transaction_attachment_mobile(
+                    "22222222-2222-2222-2222-222222222222"
+                ),
+            ),
+            (
+                "update_category_group_order_mobile",
+                "Mobile_UpdateCategoryGroupOrderMutation",
+                {"id": "33333333-3333-3333-3333-333333333333", "order": 3},
+                lambda: self.monarch_money.update_category_group_order_mobile(
+                    "33333333-3333-3333-3333-333333333333", 3
+                ),
+            ),
+            (
+                "update_category_order_mobile",
+                "Mobile_UpdateCategoryOrderMutation",
+                {
+                    "id": "44444444-4444-4444-4444-444444444444",
+                    "categoryGroupId": "55555555-5555-5555-5555-555555555555",
+                    "order": 2,
+                },
+                lambda: self.monarch_money.update_category_order_mobile(
+                    "44444444-4444-4444-4444-444444444444",
+                    "55555555-5555-5555-5555-555555555555",
+                    2,
+                ),
+            ),
+            (
+                "cancel_subscription_sponsorship",
+                "Web_BillingSettingsCancelSponsorship",
+                {"input": {"subscriptionSponsorshipId": "sponsor-1"}},
+                lambda: self.monarch_money.cancel_subscription_sponsorship(
+                    {"subscriptionSponsorshipId": "sponsor-1"}
+                ),
+            ),
+            (
+                "delete_transaction_attachment_web",
+                "Web_TransactionDrawerDeleteAttachment",
+                {"id": "66666666-6666-6666-6666-666666666666"},
+                lambda: self.monarch_money.delete_transaction_attachment_web(
+                    "66666666-6666-6666-6666-666666666666"
+                ),
+            ),
+            (
+                "update_account_order",
+                "Web_UpdateAccountOrder",
+                {"input": {"id": "acct-1", "order": 1}},
+                lambda: self.monarch_money.update_account_order(
+                    {"id": "acct-1", "order": 1}
+                ),
+            ),
+            (
+                "update_category_group_order_web",
+                "Web_UpdateCategoryGroupOrder",
+                {"id": "77777777-7777-7777-7777-777777777777", "order": 1},
+                lambda: self.monarch_money.update_category_group_order_web(
+                    "77777777-7777-7777-7777-777777777777", 1
+                ),
+            ),
+            (
+                "update_category_order_web",
+                "Web_UpdateCategoryOrder",
+                {
+                    "id": "88888888-8888-8888-8888-888888888888",
+                    "categoryGroupId": "99999999-9999-9999-9999-999999999999",
+                    "order": 5,
+                },
+                lambda: self.monarch_money.update_category_order_web(
+                    "88888888-8888-8888-8888-888888888888",
+                    "99999999-9999-9999-9999-999999999999",
+                    5,
+                ),
+            ),
+            (
+                "update_dismissed_retail_sync_banner",
+                "Web_UpdateDismissedRetailSyncBanner",
+                {
+                    "dismissedRetailSyncBanner": True,
+                    "dismissedRetailSyncTargetBannerAt": "2026-02-19T00:00:00Z",
+                },
+                lambda: self.monarch_money.update_dismissed_retail_sync_banner(
+                    True, "2026-02-19T00:00:00Z"
+                ),
+            ),
+            (
+                "update_transaction_rule_order",
+                "Web_UpdateRuleOrderMutation",
+                {"id": "rule-1", "order": 7},
+                lambda: self.monarch_money.update_transaction_rule_order("rule-1", 7),
+            ),
+            (
+                "get_retail_extension_settings",
+                "Common_GetRetailExtensionSettings",
+                {},
+                lambda: self.monarch_money.get_retail_extension_settings(),
+            ),
+            (
+                "get_retail_sync",
+                "Common_RetailSyncQuery",
+                {"syncId": "sync-4"},
+                lambda: self.monarch_money.get_retail_sync("sync-4"),
+            ),
+            (
+                "get_retail_syncs_with_total",
+                "Common_RetailSyncsQueryWithTotal",
+                {
+                    "filters": {"status": "completed"},
+                    "offset": 5,
+                    "limit": 10,
+                    "includeTotalCount": True,
+                },
+                lambda: self.monarch_money.get_retail_syncs_with_total(
+                    filters={"status": "completed"},
+                    offset=5,
+                    limit=10,
+                    include_total_count=True,
+                ),
+            ),
+            (
+                "get_transaction_attachment",
+                "Mobile_GetAttachmentDetails",
+                {"attachmentId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"},
+                lambda: self.monarch_money.get_transaction_attachment(
+                    "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+                ),
+            ),
+            (
+                "get_user_dismissed_retail_sync_banner",
+                "Web_GetUserDismissedRetailSyncBanner",
+                {},
+                lambda: self.monarch_money.get_user_dismissed_retail_sync_banner(),
+            ),
+            (
+                "get_user_has_configured_extension",
+                "Web_GetUserHasConfiguredExtension",
+                {},
+                lambda: self.monarch_money.get_user_has_configured_extension(),
+            ),
+        ]
+
+        for case_name, expected_operation, expected_variables, invoke in cases:
+            with self.subTest(case=case_name):
+                mock_execute_async.reset_mock()
+                await invoke()
+                kwargs = mock_execute_async.call_args.kwargs
+                self.assertEqual(kwargs["operation_name"], expected_operation)
+                self.assertEqual(kwargs["variable_values"], expected_variables)
+
     async def test_login(self):
         """
         Test the login method with empty values for email and password.
