@@ -100,23 +100,32 @@ As of writing this README, the following methods are supported:
 ## Non-Mutating Methods
 
 - `get_accounts` - gets all the accounts linked to Monarch
-- `get_account_holdings` - gets all of the securities in a brokerage or similar type of account
 - `get_account_type_options` - all account types and their subtypes available in Monarch
+- `get_recent_account_balances` - gets daily balances for all accounts from a start date
+- `get_account_snapshots_by_type` - gets snapshots grouped by account type for month/year timeframes
+- `get_aggregate_snapshots` - gets aggregate daily account value snapshots
+- `get_account_holdings` - gets all of the securities in a brokerage or similar type of account
 - `get_account_history` - gets all daily account history for the specified account
-- `get_institutions` -- gets institutions linked to Monarch
-- `get_budgets` — all the budgets and the corresponding actual amounts
+- `get_institutions` - gets institutions linked to Monarch
+- `get_budgets` - all the budgets and the corresponding actual amounts
 - `get_subscription_details` - gets the Monarch account's status (e.g. paid or trial)
-- `get_recurring_transactions` - gets the future recurring transactions, including merchant and account details
 - `get_transactions_summary` - gets the transaction summary data from the transactions page
 - `get_transactions` - gets transaction data, defaults to returning the last 100 transactions; can also be searched by date range
 - `get_transaction_categories` - gets all of the categories configured in the account
-- `get_transaction_category_groups` all category groups configured in the account- 
+- `get_transaction_category_groups` - gets all category groups configured in the account
 - `get_transaction_details` - gets detailed transaction data for a single transaction
 - `get_transaction_splits` - gets transaction splits for a single transaction
 - `get_transaction_tags` - gets all of the tags configured in the account
 - `get_cashflow` - gets cashflow data (by category, category group, merchant and a summary)
 - `get_cashflow_summary` - gets cashflow summary (income, expense, savings, savings rate)
+- `get_recurring_transactions` - gets the future recurring transactions, including merchant and account details
 - `is_accounts_refresh_complete` - gets the status of a running account refresh
+- `get_transaction_attachment` - gets a transaction attachment by attachment ID
+- `get_retail_extension_settings` - gets retail extension settings for configured vendors
+- `get_retail_sync` - gets a single retail sync and its orders
+- `get_retail_syncs_with_total` - gets paginated retail syncs and total count
+- `get_user_has_configured_extension` - checks whether the retail sync extension is configured
+- `get_user_dismissed_retail_sync_banner` - gets retail sync banner dismissal/profile state
 
 ## Mutating Methods
 
@@ -131,11 +140,32 @@ As of writing this README, the following methods are supported:
 - `update_transaction_splits` - modifies how a transaction is split (or not)
 - `create_transaction_tag` - creates a tag for transactions
 - `set_transaction_tags` - sets the tags on a transaction
+- `update_transaction_tag_order` - updates sort order for a transaction tag
 - `set_budget_amount` - sets a budget's value to the given amount (date allowed, will only apply to month specified by default). A zero amount value will "unset" or "clear" the budget for the given category.
 - `create_manual_account` - creates a new manual account
 - `delete_account` - deletes an account by the provided account id
 - `update_account` - updates settings and/or balance of the provided account id
+- `update_account_group_order` - updates account group ordering
+- `update_account_order` - updates account ordering
 - `upload_account_balance_history` - uploads account history csv file for a given account
+- `get_transaction_attachment_upload_info` - gets upload metadata for transaction attachments
+- `add_transaction_attachment` - attaches an uploaded file to a transaction
+- `delete_transaction_attachment_mobile` - deletes an attachment via the mobile operation variant
+- `delete_transaction_attachment_web` - deletes an attachment via the web operation variant
+- `create_retail_sync` - creates a retail sync record
+- `start_retail_sync` - starts a retail sync
+- `complete_retail_sync` - completes a retail sync
+- `delete_retail_sync` - deletes an unmatched retail sync
+- `match_retail_transaction` - matches a retail transaction to a Monarch transaction
+- `update_retail_order` - updates a retail order
+- `update_retail_vendor_settings` - updates retail vendor sync settings
+- `update_dismissed_retail_sync_banner` - updates retail sync banner dismissal fields on the user profile
+- `update_category_group_order_mobile` - updates category group ordering via mobile operation
+- `update_category_group_order_web` - updates category group ordering via web operation
+- `update_category_order_mobile` - updates category ordering within a group via mobile operation
+- `update_category_order_web` - updates category ordering within a group via web operation
+- `update_transaction_rule_order` - updates transaction rule ordering
+- `cancel_subscription_sponsorship` - cancels a subscription sponsorship
 
 # Contributing
 
@@ -161,3 +191,5 @@ Don't forget to use a password unique to your Monarch account and to enable mult
 *Disclaimer: These projects are neither affiliated nor endorsed by the `monarch` project.*
 
 - [monarch-money-amazon-connector](https://github.com/elsell/monarch-money-amazon-connector): Automate annotating and tagging Amazon transactions (ALPHA)
+
+
