@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import json
 from gql import Client
-from monarchmoney import MonarchMoney
-from monarchmoney.monarchmoney import LoginFailedException
+from monarch import Monarch
+from monarch.monarch import LoginFailedException
 
 
-class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
+class TestMonarch(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         """
         Set up any necessary data or variables for the tests here.
@@ -21,7 +21,7 @@ class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
                 "token": "test_token",
             }
             pickle.dump(session_data, fh)
-        self.monarch_money = MonarchMoney()
+        self.monarch_money = Monarch()
         self.monarch_money.load_session("temp_session.pickle")
 
     @patch.object(Client, "execute_async")
@@ -29,7 +29,7 @@ class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
         """
         Test the get_accounts method.
         """
-        mock_execute_async.return_value = TestMonarchMoney.loadTestData(
+        mock_execute_async.return_value = TestMonarch.loadTestData(
             filename="get_accounts.json",
         )
         result = await self.monarch_money.get_accounts()
@@ -80,7 +80,7 @@ class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
         """
         Test the get_transactions_summary method.
         """
-        mock_execute_async.return_value = TestMonarchMoney.loadTestData(
+        mock_execute_async.return_value = TestMonarch.loadTestData(
             filename="get_transactions_summary.json",
         )
         result = await self.monarch_money.get_transactions_summary()
@@ -124,7 +124,7 @@ class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
         Test the get_account_type_options method.
         """
         # Mock the execute_async method to return a test result
-        mock_execute_async.return_value = TestMonarchMoney.loadTestData(
+        mock_execute_async.return_value = TestMonarch.loadTestData(
             filename="get_account_type_options.json",
         )
 
@@ -163,7 +163,7 @@ class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
         Test the get_account_holdings method.
         """
         # Mock the execute_async method to return a test result
-        mock_execute_async.return_value = TestMonarchMoney.loadTestData(
+        mock_execute_async.return_value = TestMonarch.loadTestData(
             filename="get_account_holdings.json",
         )
 
@@ -205,7 +205,7 @@ class TestMonarchMoney(unittest.IsolatedAsyncioTestCase):
         """
         Test the get_accounts method.
         """
-        mock_execute_async.return_value = TestMonarchMoney.loadTestData(
+        mock_execute_async.return_value = TestMonarch.loadTestData(
             filename="get_budgets.json",
         )
         result = await self.monarch_money.get_budgets(

@@ -1,0 +1,2 @@
+# Additional requirements for examples
+keyring>=24.0.0

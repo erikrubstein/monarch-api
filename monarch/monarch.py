@@ -23,8 +23,8 @@ SESSION_DIR = ".mm"
 SESSION_FILE = f"{SESSION_DIR}/mm_session.pickle"
 
 
-class MonarchMoneyEndpoints(object):
-    BASE_URL = "https://api.monarchmoney.com"
+class MonarchEndpoints(object):
+    BASE_URL = "https://api.monarch.com"
 
     @classmethod
     def getLoginEndpoint(cls) -> str:
@@ -51,7 +51,7 @@ class RequestFailedException(Exception):
     pass
 
 
-class MonarchMoney(object):
+class Monarch(object):
     def __init__(
         self,
         session_file: str = SESSION_FILE,
@@ -62,7 +62,7 @@ class MonarchMoney(object):
             "Accept": "application/json",
             "Client-Platform": "web",
             "Content-Type": "application/json",
-            "User-Agent": "MonarchMoneyAPI (https://github.com/hammem/monarchmoney)",
+            "User-Agent": "MonarchAPI (https://github.com/hammem/monarch)",
         }
         if token:
             self._headers["Authorization"] = f"Token {token}"
@@ -110,7 +110,7 @@ class MonarchMoney(object):
         save_session: bool = True,
         mfa_secret_key: Optional[str] = None,
     ) -> None:
-        """Logs into a Monarch Money account."""
+        """Logs into a Monarch account."""
         if use_saved_session and os.path.exists(self._session_file):
             print(f"Using saved session found at {self._session_file}")
             self.load_session(self._session_file)
@@ -127,12 +127,12 @@ class MonarchMoney(object):
     async def multi_factor_authenticate(
         self, email: str, password: str, code: str
     ) -> None:
-        """Performs multi-factor authentication to access a Monarch Money account."""
+        """Performs multi-factor authentication to access a Monarch account."""
         await self._multi_factor_authenticate(email, password, code)
 
     async def get_accounts(self) -> Dict[str, Any]:
         """
-        Gets the list of accounts configured in the Monarch Money account.
+        Gets the list of accounts configured in the Monarch account.
         """
         query = gql(
             """
@@ -1376,7 +1376,7 @@ class MonarchMoney(object):
 
     async def get_subscription_details(self) -> Dict[str, Any]:
         """
-        The type of subscription for the Monarch Money account.
+        The type of subscription for the Monarch account.
         """
         query = gql(
             """
@@ -2691,7 +2691,7 @@ class MonarchMoney(object):
 
         async with ClientSession(headers=self._headers) as session:
             resp = await session.post(
-                MonarchMoneyEndpoints.getAccountBalanceHistoryUploadEndpoint(),
+                MonarchEndpoints.getAccountBalanceHistoryUploadEndpoint(),
                 json=form,
             )
             if resp.status != 200:
@@ -2703,7 +2703,7 @@ class MonarchMoney(object):
         end_date: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Fetches upcoming recurring transactions from Monarch Money's API.  This includes
+        Fetches upcoming recurring transactions from Monarch's API.  This includes
         all merchant data, as well as the accounts where the charge will take place.
         """
         query = gql(
@@ -2793,7 +2793,7 @@ class MonarchMoney(object):
         variables: Dict[str, Any] = {},
     ) -> Dict[str, Any]:
         """
-        Makes a GraphQL call to Monarch Money's API.
+        Makes a GraphQL call to Monarch's API.
         """
         return await self._get_graphql_client().execute_async(
             request=graphql_query, variable_values=variables, operation_name=operation
@@ -2801,7 +2801,7 @@ class MonarchMoney(object):
 
     def save_session(self, filename: Optional[str] = None) -> None:
         """
-        Saves the auth token needed to access a Monarch Money account.
+        Saves the auth token needed to access a Monarch account.
         """
         if filename is None:
             filename = self._session_file
@@ -2839,7 +2839,7 @@ class MonarchMoney(object):
         self, email: str, password: str, mfa_secret_key: Optional[str]
     ) -> None:
         """
-        Performs the initial login to a Monarch Money account.
+        Performs the initial login to a Monarch account.
         """
         data = {
             "password": password,
@@ -2853,7 +2853,7 @@ class MonarchMoney(object):
 
         async with ClientSession(headers=self._headers) as session:
             async with session.post(
-                MonarchMoneyEndpoints.getLoginEndpoint(), json=data
+                MonarchEndpoints.getLoginEndpoint(), json=data
             ) as resp:
                 if resp.status == 403:
                     raise RequireMFAException("Multi-Factor Auth Required")
@@ -2882,7 +2882,7 @@ class MonarchMoney(object):
 
         async with ClientSession(headers=self._headers) as session:
             async with session.post(
-                MonarchMoneyEndpoints.getLoginEndpoint(), json=data
+                MonarchEndpoints.getLoginEndpoint(), json=data
             ) as resp:
                 if resp.status != 200:
                     try:
@@ -2905,14 +2905,14 @@ class MonarchMoney(object):
 
     def _get_graphql_client(self) -> Client:
         """
-        Creates a correctly configured GraphQL client for connecting to Monarch Money.
+        Creates a correctly configured GraphQL client for connecting to Monarch.
         """
         if self._headers is None:
             raise LoginFailedException(
                 "Make sure you call login() first or provide a session token!"
             )
         transport = AIOHTTPTransport(
-            url=MonarchMoneyEndpoints.getGraphQL(),
+            url=MonarchEndpoints.getGraphQL(),
             headers=self._headers,
             timeout=self._timeout,
         )

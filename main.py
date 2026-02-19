@@ -2,14 +2,14 @@ import asyncio
 import os
 import json
 
-from monarchmoney import MonarchMoney
+from monarch import Monarch
 
 _SESSION_FILE_ = ".mm/mm_session.pickle"
 
 
 def main() -> None:
     # Use session file
-    mm = MonarchMoney(session_file=_SESSION_FILE_)
+    mm = Monarch(session_file=_SESSION_FILE_)
     asyncio.run(mm.interactive_login())
 
     # Subscription details

@@ -1,6 +1,6 @@
-# Monarch Money
+# Monarch
 
-Python library for accessing [Monarch Money](https://www.monarchmoney.com/referral/ngam2i643l) data.
+Python library for accessing [Monarch](https://www.monarch.com) data.
 
 # Installation
 
@@ -8,11 +8,11 @@ Python library for accessing [Monarch Money](https://www.monarchmoney.com/referr
 
 Clone this repository from Git
 
-`git clone https://github.com/hammem/monarchmoney.git`
+`git clone https://github.com/hammem/monarch.git`
 
 ## Via `pip`
 
-`pip install monarchmoney`
+`pip install monarch`
 # Instantiate & Login
 
 There are two ways to use this library: interactive and non-interactive.
@@ -22,9 +22,9 @@ There are two ways to use this library: interactive and non-interactive.
 If you're using this library in something like iPython or Jupyter, you can run an interactive-login which supports multi-factor authentication:
 
 ```python
-from monarchmoney import MonarchMoney
+from monarch import Monarch
 
-mm = MonarchMoney()
+mm = Monarch()
 await mm.interactive_login()
 ```
 This will prompt you for the email, password and, if needed, the multi-factor token.
@@ -34,29 +34,29 @@ This will prompt you for the email, password and, if needed, the multi-factor to
 For a non-interactive session, you'll need to create an instance and login:
 
 ```python
-from monarchmoney import MonarchMoney
+from monarch import Monarch
 
-mm = MonarchMoney()
+mm = Monarch()
 await mm.login(email, password)
 ```
 
 This may throw a `RequireMFAException`.  If it does, you'll need to get a multi-factor token and call the following method:
 
 ```python
-from monarchmoney import MonarchMoney, RequireMFAException
+from monarch import Monarch, RequireMFAException
 
-mm = MonarchMoney()
+mm = Monarch()
 try:
         await mm.login(email, password)
 except RequireMFAException:
         await mm.multi_factor_authenticate(email, password, multi_factor_code)
 ```
 
-Alternatively, you can provide the MFA Secret Key. The MFA Secret Key is found when setting up the MFA in Monarch Money by going to Settings -> Security -> Enable MFA -> and copy the "Two-factor text code". Then provide it in the login() method:
+Alternatively, you can provide the MFA Secret Key. The MFA Secret Key is found when setting up the MFA in Monarch by going to Settings -> Security -> Enable MFA -> and copy the "Two-factor text code". Then provide it in the login() method:
 ```python
-from monarchmoney import MonarchMoney, RequireMFAException
+from monarch import Monarch, RequireMFAException
 
-mm = MonarchMoney()
+mm = Monarch()
 await mm.login(
         email=email,
         password=password,
@@ -72,9 +72,9 @@ await mm.login(
 You can easily save your session for use later on.  While we don't know precisely how long a session lasts, authors of this library have found it can last several months.
 
 ```python
-from monarchmoney import MonarchMoney, RequireMFAException
+from monarch import Monarch, RequireMFAException
 
-mm = MonarchMoney()
+mm = Monarch()
 mm.interactive_login()
 
 # Save it for later, no more need to login!
@@ -84,9 +84,9 @@ mm.save_session()
 Once you've logged in, you can simply load the saved session to pick up where you left off.
 
 ```python
-from monarchmoney import MonarchMoney, RequireMFAException
+from monarch import Monarch, RequireMFAException
 
-mm = MonarchMoney()
+mm = Monarch()
 mm.load_session()
 
 # Then, start accessing data!
@@ -99,13 +99,13 @@ As of writing this README, the following methods are supported:
 
 ## Non-Mutating Methods
 
-- `get_accounts` - gets all the accounts linked to Monarch Money
+- `get_accounts` - gets all the accounts linked to Monarch
 - `get_account_holdings` - gets all of the securities in a brokerage or similar type of account
-- `get_account_type_options` - all account types and their subtypes available in Monarch Money- 
+- `get_account_type_options` - all account types and their subtypes available in Monarch
 - `get_account_history` - gets all daily account history for the specified account
-- `get_institutions` -- gets institutions linked to Monarch Money
+- `get_institutions` -- gets institutions linked to Monarch
 - `get_budgets` — all the budgets and the corresponding actual amounts
-- `get_subscription_details` - gets the Monarch Money account's status (e.g. paid or trial)
+- `get_subscription_details` - gets the Monarch account's status (e.g. paid or trial)
 - `get_recurring_transactions` - gets the future recurring transactions, including merchant and account details
 - `get_transactions_summary` - gets the transaction summary data from the transactions page
 - `get_transactions` - gets transaction data, defaults to returning the last 100 transactions; can also be searched by date range
@@ -123,8 +123,8 @@ As of writing this README, the following methods are supported:
 - `delete_transaction_category` - deletes a category for transactions
 - `delete_transaction_categories` - deletes a list of transaction categories for transactions
 - `create_transaction_category` - creates a category for transactions
-- `request_accounts_refresh` - requests a synchronization / refresh of all accounts linked to Monarch Money. This is a **non-blocking call**. If the user wants to check on the status afterwards, they must call `is_accounts_refresh_complete`.
-- `request_accounts_refresh_and_wait` - requests a synchronization / refresh of all accounts linked to Monarch Money. This is a **blocking call** and will not return until the refresh is complete or no longer running.
+- `request_accounts_refresh` - requests a synchronization / refresh of all accounts linked to Monarch. This is a **non-blocking call**. If the user wants to check on the status afterwards, they must call `is_accounts_refresh_complete`.
+- `request_accounts_refresh_and_wait` - requests a synchronization / refresh of all accounts linked to Monarch. This is a **blocking call** and will not return until the refresh is complete or no longer running.
 - `create_transaction` - creates a transaction with the given attributes
 - `update_transaction` - modifies one or more attributes for an existing transaction
 - `delete_transaction` - deletes a given transaction by the provided transaction id
@@ -152,12 +152,12 @@ Actions are configured in this repo to run against all PRs and merges which will
 
 **How do I use this API if I login to Monarch via Google?**
 
-If you currently use Google or 'Continue with Google' to access your Monarch account, you'll need to set a password to leverage this API.  You can set a password on your Monarch account by going to your [security settings](https://app.monarchmoney.com/settings/security).  
+If you currently use Google or 'Continue with Google' to access your Monarch account, you'll need to set a password to leverage this API.  You can set a password on your Monarch account by going to your [security settings](https://app.monarch.com/settings/security).  
 
 Don't forget to use a password unique to your Monarch account and to enable multi-factor authentication!
 
 # Projects Using This Library
 
-*Disclaimer: These projects are neither affiliated nor endorsed by the `monarchmoney` project.*
+*Disclaimer: These projects are neither affiliated nor endorsed by the `monarch` project.*
 
 - [monarch-money-amazon-connector](https://github.com/elsell/monarch-money-amazon-connector): Automate annotating and tagging Amazon transactions (ALPHA)

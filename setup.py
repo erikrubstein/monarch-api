@@ -5,17 +5,17 @@ from setuptools import setup
 install_requires = open("requirements.txt", "r").read().split("\n")
 
 setup(
-    name="monarchmoney",
-    description="Monarch Money API for Python",
+    name="monarch",
+    description="Monarch API for Python",
     long_description=open("README.md", "r").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/hammem/monarchmoney",
+    url="https://github.com/hammem/monarch",
     author="hammem",
     author_email="hammem@users.noreply.github.com",
     license="MIT",
-    keywords="monarch money, financial, money, personal finance",
+    keywords="monarch, financial, personal finance",
     install_requires=install_requires,
-    packages=["monarchmoney"],
+    packages=["monarch"],
     include_package_data=True,
     zip_safe=False,
     platforms="any",

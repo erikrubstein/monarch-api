@@ -1,13 +1,13 @@
 """
-monarchmoney
+monarch
 
-A Python API for interacting with MonarchMoney.
+A Python API for interacting with Monarch.
 """
 
-from .monarchmoney import (
+from .monarch import (
     LoginFailedException,
-    MonarchMoneyEndpoints,
-    MonarchMoney,
+    MonarchEndpoints,
+    Monarch,
     RequireMFAException,
     RequestFailedException,
 )
